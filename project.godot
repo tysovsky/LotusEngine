@@ -1,0 +1,109 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Spatial",
+"class": "Battlefield",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Battlefield.gd"
+}, {
+"base": "MeshInstance",
+"class": "Card",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Card.gd"
+}, {
+"base": "Spatial",
+"class": "Deck",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Deck.gd"
+}, {
+"base": "Node",
+"class": "Effect",
+"language": "GDScript",
+"path": "res://Assets/Scripts/Effects/Effect.gd"
+}, {
+"base": "Spatial",
+"class": "Game",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Game.gd"
+}, {
+"base": "Spatial",
+"class": "Graveyard",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Graveyard.gd"
+}, {
+"base": "Spatial",
+"class": "Hand",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Hand.gd"
+}, {
+"base": "Reference",
+"class": "MTG",
+"language": "GDScript",
+"path": "res://Assets/Scripts/MTGEnums.gd"
+}, {
+"base": "Effect",
+"class": "ManaEffect",
+"language": "GDScript",
+"path": "res://Assets/Scripts/Effects/ManaEffect.gd"
+}, {
+"base": "Node",
+"class": "Player",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Player.gd"
+}, {
+"base": "Spatial",
+"class": "Stack",
+"language": "GDScript",
+"path": "res://Assets/Scripts/GameComponents/Stack.gd"
+}, {
+"base": "Effect",
+"class": "StackEffect",
+"language": "GDScript",
+"path": "res://Assets/Scripts/Effects/StackEffect.gd"
+} ]
+_global_script_class_icons={
+"Battlefield": "",
+"Card": "",
+"Deck": "",
+"Effect": "",
+"Game": "",
+"Graveyard": "",
+"Hand": "",
+"MTG": "",
+"ManaEffect": "",
+"Player": "",
+"Stack": "",
+"StackEffect": ""
+}
+
+[application]
+
+config/name="LotusEngine"
+run/main_scene="res://Assets/Scenes/Game.tscn"
+config/icon="res://Assets/Icons/icon.png"
+
+[display]
+
+window/size/fullscreen=true
+
+[input]
+
+drag={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+
+[rendering]
+
+quality/intended_usage/framebuffer_allocation.mobile=2
+quality/filters/anisotropic_filter_level=1
+quality/subsurface_scattering/quality=2

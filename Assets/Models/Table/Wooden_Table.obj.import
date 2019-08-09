@@ -1,0 +1,18 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/Wooden_Table.obj-7f3c27bafb675fa71b8c567a6dca9c04.mesh"
+
+[deps]
+
+files=[ "res://.import/Wooden_Table.obj-7f3c27bafb675fa71b8c567a6dca9c04.mesh" ]
+
+source_file="res://Assets/Models/Table/Wooden_Table.obj"
+dest_files=[ "res://.import/Wooden_Table.obj-7f3c27bafb675fa71b8c567a6dca9c04.mesh", "res://.import/Wooden_Table.obj-7f3c27bafb675fa71b8c567a6dca9c04.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+optimize_mesh=true
