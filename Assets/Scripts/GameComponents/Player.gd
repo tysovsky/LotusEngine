@@ -5,6 +5,8 @@ class_name Player
 signal card_played
 signal card_resolved
 
+var Id : int
+var Username : String
 var Deck : Deck
 var Hand : Hand
 var Graveyard : Graveyard

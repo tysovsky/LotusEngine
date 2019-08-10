@@ -18,6 +18,10 @@ func subscribe_to_signals():
 		player.connect("card_resolved", self, "_card_resolved")
 		
 func _card_resolved(card : Card):
+	
+	if card.Controller != get_parent():
+		return
+	
 	var row : Spatial
 	
 	if(MTG.Type.Creature in card.Type

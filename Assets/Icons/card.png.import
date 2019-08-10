@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/isd-78-snapcaster-mage.jpg-8183a8c95ee3d1cd77b760e6519e0a75.s3tc.stex"
-path.etc2="res://.import/isd-78-snapcaster-mage.jpg-8183a8c95ee3d1cd77b760e6519e0a75.etc2.stex"
+path.s3tc="res://.import/card.png-eefc952fcd199657f7ab8b839cf32e15.s3tc.stex"
+path.etc2="res://.import/card.png-eefc952fcd199657f7ab8b839cf32e15.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Cards/Images/S/isd-78-snapcaster-mage.jpg"
-dest_files=[ "res://.import/isd-78-snapcaster-mage.jpg-8183a8c95ee3d1cd77b760e6519e0a75.s3tc.stex", "res://.import/isd-78-snapcaster-mage.jpg-8183a8c95ee3d1cd77b760e6519e0a75.etc2.stex" ]
+source_file="res://Assets/Icons/card.png"
+dest_files=[ "res://.import/card.png-eefc952fcd199657f7ab8b839cf32e15.s3tc.stex", "res://.import/card.png-eefc952fcd199657f7ab8b839cf32e15.etc2.stex" ]
 
 [params]
 

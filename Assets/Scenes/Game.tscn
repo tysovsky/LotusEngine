@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://Assets/Scripts/GameComponents/Game.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Scenes/UI.tscn" type="PackedScene" id=2]
@@ -11,22 +11,26 @@
 [ext_resource path="res://Assets/Models/Table/Bot_Mixed_AO.png" type="Texture" id=9]
 [ext_resource path="res://Assets/Models/Table/table_parts_Bot_Normal.png" type="Texture" id=10]
 [ext_resource path="res://Assets/Models/Table/table_parts_Bot_SpecularSmoothness.png" type="Texture" id=11]
-[ext_resource path="res://Assets/Scripts/GameComponents/Network.gd" type="Script" id=12]
-[ext_resource path="res://Assets/HDR/cayley_interior_4k.hdr" type="Texture" id=13]
-[ext_resource path="res://Assets/Scripts/GameComponents/Player.gd" type="Script" id=14]
-[ext_resource path="res://Assets/Scripts/GameComponents/Hand.gd" type="Script" id=15]
-[ext_resource path="res://Assets/Scenes/Card.tscn" type="PackedScene" id=16]
-[ext_resource path="res://Cards/Scripts/S/Swamp.gd" type="Script" id=17]
-[ext_resource path="res://Cards/Scripts/S/Snapcaster_Mage.gd" type="Script" id=18]
-[ext_resource path="res://Cards/Scripts/D/Dark_Confidant.gd" type="Script" id=19]
-[ext_resource path="res://Assets/Scripts/GameComponents/Deck.gd" type="Script" id=20]
-[ext_resource path="res://Assets/Scripts/GameComponents/Graveyard.gd" type="Script" id=21]
-[ext_resource path="res://Assets/Scripts/GameComponents/Exile.gd" type="Script" id=22]
-[ext_resource path="res://Assets/Scripts/GameComponents/Reveal.gd" type="Script" id=23]
-[ext_resource path="res://Assets/Scripts/GameComponents/Stack.gd" type="Script" id=24]
-[ext_resource path="res://Assets/Scripts/GameComponents/Battlefield.gd" type="Script" id=25]
-[ext_resource path="res://Cards/Images/S/isd-78-snapcaster-mage.jpg" type="Texture" id=26]
-[ext_resource path="res://Assets/Fonts/Beleren-Bold.ttf" type="DynamicFontData" id=27]
+[ext_resource path="res://Assets/Scripts/MainCamera.gd" type="Script" id=12]
+[ext_resource path="res://Assets/Scripts/GameComponents/NetworkManager.gd" type="Script" id=13]
+[ext_resource path="res://Assets/HDR/cayley_interior_4k.hdr" type="Texture" id=14]
+[ext_resource path="res://Assets/Scripts/GameComponents/Player.gd" type="Script" id=15]
+[ext_resource path="res://Assets/Scripts/GameComponents/Hand.gd" type="Script" id=16]
+[ext_resource path="res://Assets/Scenes/Card.tscn" type="PackedScene" id=17]
+[ext_resource path="res://Cards/Scripts/S/Swamp.gd" type="Script" id=18]
+[ext_resource path="res://Cards/Scripts/S/Snapcaster_Mage.gd" type="Script" id=19]
+[ext_resource path="res://Cards/Scripts/D/Dark_Confidant.gd" type="Script" id=20]
+[ext_resource path="res://Assets/Scripts/GameComponents/Deck.gd" type="Script" id=21]
+[ext_resource path="res://Assets/Scripts/GameComponents/Graveyard.gd" type="Script" id=22]
+[ext_resource path="res://Assets/Scripts/GameComponents/Exile.gd" type="Script" id=23]
+[ext_resource path="res://Assets/Scripts/GameComponents/Reveal.gd" type="Script" id=24]
+[ext_resource path="res://Assets/Scripts/GameComponents/Stack.gd" type="Script" id=25]
+[ext_resource path="res://Assets/Scripts/GameComponents/Battlefield.gd" type="Script" id=26]
+[ext_resource path="res://Assets/Scripts/GameComponents/OpponentHand.gd" type="Script" id=27]
+[ext_resource path="res://Assets/Icons/card.png" type="Texture" id=28]
+[ext_resource path="res://Assets/Fonts/Beleren-Bold.ttf" type="DynamicFontData" id=29]
+[ext_resource path="res://Cards/Images/B/leb-233-black-lotus.png" type="Texture" id=30]
+[ext_resource path="res://Assets/Scenes/btnJoinServer.gd" type="Script" id=31]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_texture = ExtResource( 4 )
@@ -57,15 +61,73 @@ ao_on_uv2 = false
 ao_texture_channel = 0
 
 [sub_resource type="PanoramaSky" id=3]
-panorama = ExtResource( 13 )
+panorama = ExtResource( 14 )
 
 [sub_resource type="Environment" id=4]
 background_mode = 2
 background_sky = SubResource( 3 )
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="CubeMesh" id=5]
+size = Vector3( 1.5, 1, 2.01 )
+
+[sub_resource type="CubeMesh" id=6]
+size = Vector3( 1.5, 1, 2.01 )
+
+[sub_resource type="Shader" id=7]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D albedo : hint_albedo;
+uniform sampler2D mask;
+
+void fragment(){
+	ALBEDO = texture(albedo, UV).xyz;
+	float a = texture(mask, UV).x;
+	if(a < .5){
+		ALPHA = 0.0;
+	}
+	else{
+		ALPHA = 1.0;
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = SubResource( 7 )
+shader_param/albedo = ExtResource( 28 )
+
+[sub_resource type="DynamicFont" id=9]
 size = 20
-font_data = ExtResource( 27 )
+font_data = ExtResource( 29 )
+
+[sub_resource type="Shader" id=10]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+uniform sampler2D albedo : hint_albedo;
+
+void fragment(){
+	COLOR = texture(albedo, UV);
+}"
+
+[sub_resource type="ShaderMaterial" id=11]
+shader = SubResource( 10 )
+shader_param/albedo = ExtResource( 30 )
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends Button
+
+func load_deck(filename):
+	var file = File.new()
+	file.open(filename, file.READ)
+	var cards = \"res://Cards/Scripts/B/Black_Lotus.gd|res://Cards/Scripts/D/Dark_Confidant.gd|res://Cards/Scripts/S/Swamp.gd|res://Cards/Scripts/S/Swamp.gd\" #file.get_line()
+	get_tree().root.get_node(\"Game/Players/Player/Deck\").from_string(cards)
+	file.close()
+
+func _pressed():
+	load_deck(\"res://deck1.txt\")
+	get_tree().root.get_node(\"Game/NetworkManager\").start_server()
+	
+	get_parent().hide()"
 
 [node name="Game" type="Spatial"]
 script = ExtResource( 1 )
@@ -77,6 +139,7 @@ margin_left = -153.0
 margin_top = -88.0
 
 [node name="Table" type="Spatial" parent="."]
+editor/display_folded = true
 
 [node name="Wooden_Table" type="MeshInstance" parent="Table"]
 transform = Transform( -2.18557e-08, 0, 0.5, 0, 0.5, 0, -0.5, 0, -2.18557e-08, 0, -14.0055, -3.59043 )
@@ -86,60 +149,63 @@ material/1 = SubResource( 2 )
 
 [node name="MainCamera" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.202724, 0.979236, 0, -0.979236, 0.202724, 0, 10.0703, 3.13232 )
-
-[node name="Network" type="Node" parent="."]
 script = ExtResource( 12 )
+
+[node name="NetworkManager" type="Node" parent="."]
+script = ExtResource( 13 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 4 )
 
 [node name="Players" type="Node" parent="."]
 
-[node name="Player" type="Node" parent="Players"]
-script = ExtResource( 14 )
-
-[node name="Hand" type="Spatial" parent="Players/Player"]
+[node name="Player" type="Spatial" parent="Players"]
 script = ExtResource( 15 )
 
-[node name="Card" parent="Players/Player/Hand" instance=ExtResource( 16 )]
+[node name="Hand" type="Spatial" parent="Players/Player"]
+editor/display_folded = true
+script = ExtResource( 16 )
 
-[node name="Card2" parent="Players/Player/Hand" instance=ExtResource( 16 )]
-editor/display_folded = false
-script = ExtResource( 17 )
+[node name="Card" parent="Players/Player/Hand" instance=ExtResource( 17 )]
 
-[node name="Card3" parent="Players/Player/Hand" instance=ExtResource( 16 )]
+[node name="Card2" parent="Players/Player/Hand" instance=ExtResource( 17 )]
 script = ExtResource( 18 )
 
-[node name="Card5" parent="Players/Player/Hand" instance=ExtResource( 16 )]
-script = ExtResource( 18 )
-
-[node name="Card8" parent="Players/Player/Hand" instance=ExtResource( 16 )]
-editor/display_folded = false
-script = ExtResource( 17 )
-
-[node name="Card6" parent="Players/Player/Hand" instance=ExtResource( 16 )]
-
-[node name="Card7" parent="Players/Player/Hand" instance=ExtResource( 16 )]
+[node name="Card3" parent="Players/Player/Hand" instance=ExtResource( 17 )]
 script = ExtResource( 19 )
 
-[node name="Deck" type="Spatial" parent="Players/Player"]
+[node name="Card5" parent="Players/Player/Hand" instance=ExtResource( 17 )]
+script = ExtResource( 19 )
+
+[node name="Card8" parent="Players/Player/Hand" instance=ExtResource( 17 )]
+script = ExtResource( 18 )
+
+[node name="Card6" parent="Players/Player/Hand" instance=ExtResource( 17 )]
+
+[node name="Card7" parent="Players/Player/Hand" instance=ExtResource( 17 )]
 script = ExtResource( 20 )
 
-[node name="Graveyard" type="Spatial" parent="Players/Player"]
+[node name="Deck" type="MeshInstance" parent="Players/Player"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8.40345, 0, 5.35989 )
+mesh = SubResource( 5 )
+material/0 = null
 script = ExtResource( 21 )
 
-[node name="Exile" type="Spatial" parent="Players/Player"]
+[node name="Graveyard" type="Spatial" parent="Players/Player"]
 script = ExtResource( 22 )
 
-[node name="Reveal" type="Spatial" parent="Players/Player"]
+[node name="Exile" type="Spatial" parent="Players/Player"]
 script = ExtResource( 23 )
 
-[node name="Stack" type="Spatial" parent="Players/Player"]
+[node name="Reveal" type="Spatial" parent="Players/Player"]
 script = ExtResource( 24 )
+
+[node name="Stack" type="Spatial" parent="Players/Player"]
+script = ExtResource( 25 )
 
 [node name="Battlefield" type="Spatial" parent="Players/Player"]
 editor/display_folded = true
-script = ExtResource( 25 )
+script = ExtResource( 26 )
 
 [node name="RowOne" type="Spatial" parent="Players/Player/Battlefield"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.98468 )
@@ -148,6 +214,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.98468 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.37879 )
 
 [node name="Control" type="Control" parent="Players/Player"]
+editor/display_folded = true
 visible = false
 anchor_left = 0.5
 anchor_top = 1.0
@@ -167,6 +234,74 @@ margin_left = -20.0
 margin_top = -40.0
 margin_right = 20.0
 
+[node name="Opponent" type="Spatial" parent="Players"]
+script = ExtResource( 15 )
+
+[node name="Hand" type="Spatial" parent="Players/Opponent"]
+editor/display_folded = true
+script = ExtResource( 27 )
+
+[node name="Card" parent="Players/Opponent/Hand" instance=ExtResource( 17 )]
+
+[node name="Card2" parent="Players/Opponent/Hand" instance=ExtResource( 17 )]
+
+[node name="Deck" type="MeshInstance" parent="Players/Opponent"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6062, 0, -5.49095 )
+mesh = SubResource( 6 )
+material/0 = null
+script = ExtResource( 21 )
+
+[node name="Graveyard" type="Spatial" parent="Players/Opponent"]
+script = ExtResource( 22 )
+
+[node name="Exile" type="Spatial" parent="Players/Opponent"]
+script = ExtResource( 23 )
+
+[node name="Reveal" type="Spatial" parent="Players/Opponent"]
+script = ExtResource( 24 )
+
+[node name="Stack" type="Spatial" parent="Players/Opponent"]
+script = ExtResource( 25 )
+
+[node name="Battlefield" type="Spatial" parent="Players/Opponent"]
+script = ExtResource( 26 )
+
+[node name="RowOne" type="Spatial" parent="Players/Opponent/Battlefield"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.46342 )
+
+[node name="Card8" parent="Players/Opponent/Battlefield/RowOne" instance=ExtResource( 17 )]
+visible = false
+material/0 = SubResource( 8 )
+script = null
+
+[node name="RowTwo" type="Spatial" parent="Players/Opponent/Battlefield"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.53056 )
+
+[node name="Card7" parent="Players/Opponent/Battlefield/RowTwo" instance=ExtResource( 17 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.399403 )
+visible = false
+script = null
+
+[node name="Control" type="Control" parent="Players/Opponent"]
+visible = false
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -20.0
+margin_top = -186.0
+margin_right = 20.0
+margin_bottom = -145.0
+
+[node name="Panel" type="Panel" parent="Players/Opponent/Control"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -20.0
+margin_top = -40.0
+margin_right = 20.0
+
 [node name="CardInfoPanel" type="Node2D" parent="."]
 editor/display_folded = true
 visible = false
@@ -175,21 +310,12 @@ visible = false
 margin_right = 525.0
 margin_bottom = 397.0
 
-[node name="CardImage" type="TextureRect" parent="CardInfoPanel/Panel"]
-margin_left = 13.0
-margin_top = 8.0
-margin_right = 282.0
-margin_bottom = 384.0
-texture = ExtResource( 26 )
-expand = true
-stretch_mode = 5
-
 [node name="CardName" type="RichTextLabel" parent="CardInfoPanel/Panel"]
 margin_left = 292.0
 margin_top = 11.0
 margin_right = 514.0
 margin_bottom = 39.0
-custom_fonts/mono_font = SubResource( 5 )
+custom_fonts/mono_font = SubResource( 9 )
 text = "Dark Confidant"
 
 [node name="CardText" type="RichTextLabel" parent="CardInfoPanel/Panel"]
@@ -197,10 +323,36 @@ margin_left = 289.0
 margin_top = 189.0
 margin_right = 511.0
 margin_bottom = 378.0
-custom_fonts/mono_font = SubResource( 5 )
+custom_fonts/mono_font = SubResource( 9 )
 text = "At the beginning of your upkeep, reveal the top card of your library  and put that card into your hand. You loose life equal to its converted mana cost."
 
-[node name="OmniLight" type="OmniLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.39274, 0 )
-shadow_enabled = true
-omni_range = 20.9
+[node name="CardImage" type="Sprite" parent="CardInfoPanel/Panel"]
+material = SubResource( 11 )
+position = Vector2( 143.695, 198.756 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 30 )
+
+[node name="MainMenu" type="Panel" parent="."]
+editor/display_folded = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="btnCreateServer" type="Button" parent="MainMenu"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -46.5
+margin_top = 100.0
+margin_right = 46.5
+margin_bottom = 20.0
+text = "Create Server"
+script = SubResource( 12 )
+
+[node name="btnJoinServer" type="Button" parent="MainMenu"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -39.5
+margin_top = 140.0
+margin_right = 39.5
+margin_bottom = 20.0
+text = "Join Server"
+script = ExtResource( 31 )

@@ -24,8 +24,10 @@ var SuperType = [] setget set_super_type
 var Type = [] setget set_type
 var SubType = [] setget set_sub_type
 var PreviousZone = MTG.Zone.Deck
-var Zone = MTG.Zone.Hand
+export var Zone = MTG.Zone.Hand
 var Tapped = false
+var Revealed = false
+var Me
 var Controller
 var Game
 
@@ -189,7 +191,7 @@ func on_any_enter_battlefield(card : Card):
 		on_enter_battlefield()
 
 func on_enter_battlefield():
-	print(Name + " entered the battlefield")
+	print(Name + " entered the battlefield from " + str(PreviousZone))
 
 func on_any_enter_graveyard(card : Card):
 	if(card == self):
@@ -225,7 +227,7 @@ func on_opponent_upkeep():
 	Callbacks functions
 """
 func _ready():
-	
+	Me = get_parent().get_parent().get_parent().get_node("Player")
 	Controller = get_parent().get_parent()
 	Game = get_tree().root.get_node("Game")
 	
@@ -236,7 +238,14 @@ func _ready():
 	material.albedo_texture = load("res://Cards/Images/" + Name.substr(0, 1) + "/" + ImageName)
 	material.flags_unshaded = true
 	material.flags_transparent = true
+	material.flags_no_depth_test = true
+	
+	#get_surface_material(0).set_shader_param("alb", load("res://Cards/Images/" + Name.substr(0, 1) + "/" + ImageName))
 	set_surface_material(0, material)
+	
+	if(Me != Controller && !Revealed):
+		rotate_z(PI)
+		rotate_y(PI)
 	
 	connect_to_signals()
 	
@@ -286,23 +295,24 @@ func _process(delta):
 		_lerpCounter = 1
 
 func _input(event):
-	if event is InputEventMouseMotion && _highlighted && Input.is_action_pressed("drag"):
+	if event is InputEventMouseMotion && _highlighted && Input.is_action_pressed("drag") && Controller == Me:
 		global_translate(Vector3(event.relative.x, 0, event.relative.y) * 0.01)
 
 func _mouse_entered():
 	_highlighted = true
-	_lerpCounter = 0
-	_transform = true
-	
-	#translate up slightly so that this card is drawn on top when in hand
-	if (Zone == MTG.Zone.Hand):
-		translate_object_local(Vector3.UP * 0.01)
+	if(Controller == Me):
+		_lerpCounter = 0
+		_transform = true
+		
+		#translate up slightly so that this card is drawn on top when in hand
+		if (Zone == MTG.Zone.Hand):
+			translate_object_local(Vector3.UP * 0.01)
 		
 	if (Zone == MTG.Zone.Battlefield):		
 		var cardinfopanel : Node2D = get_tree().root.get_node("Game/CardInfoPanel")
 		
 		var pos = _mainCamera.unproject_position(global_transform.origin)
-		if(pos.x < get_viewport().size.x/2):
+		if(pos.x > get_viewport().size.x/2):
 			pos.x += 60
 		else:
 			pos.x -= 585
@@ -310,7 +320,7 @@ func _mouse_entered():
 		
 		cardinfopanel.position = pos
 		
-		cardinfopanel.get_node("Panel/CardImage").texture = load("res://Cards/Images/" + Name.substr(0, 1) + "/" + ImageName)
+		cardinfopanel.get_node("Panel/CardImage").material.set_shader_param("albedo",load("res://Cards/Images/" + Name.substr(0, 1) + "/" + ImageName))
 		cardinfopanel.get_node("Panel/CardName").text = Name
 		cardinfopanel.get_node("Panel/CardText").text = CardText
 		cardinfopanel.show()
